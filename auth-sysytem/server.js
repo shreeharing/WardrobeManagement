@@ -24,6 +24,7 @@ app.use(passport.initialize());
 app.use(passport.session()); 
 app.use(express.static("public"));
 app.use(express.static(path.join(__dirname, ".."))); // serves index.html and style.css
+app.set('view engine', 'ejs');
 
 app.use("/auth", authRoutes);
 

@@ -1,0 +1,26 @@
+<!-- views/dashboard.ejs -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <h1>Welcome, <%= user.username %>!</h1>
+
+  <h2>Your Inventory</h2>
+  <ul>
+    <% inventory.forEach(item => { %>
+      <li><%= item.itemName %> - <%= item.quantity %> (<%= item.category %>)</li>
+    <% }) %>
+  </ul>
+
+  <form action="/auth/add-item" method="POST">
+  <input name="itemName" placeholder="Item Name" required />
+  <input name="quantity" type="number" placeholder="Qty" required />
+  <input name="category" placeholder="Category" />
+  <button type="submit">Add Item</button>
+</form>
+
+</body>
+</html>
