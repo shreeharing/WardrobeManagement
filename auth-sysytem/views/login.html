@@ -1,6 +1,22 @@
-<form method="POST" action="/auth/login">
-  <input name="email" placeholder="Email" required />
-  <input type="password" name="password" placeholder="Password" required />
-  <button type="submit">Login</button>
-</form>
-<a href="/auth/google">Login with Google</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link rel="stylesheet" href="/auth/login.css" />
+</head>
+<body>
+  <div class="form-container">
+    <h2>Welcome Back</h2>
+    <form method="POST" action="/auth/login">
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+      <p>Don't have an account? <a href="/auth/register">Register here</a></p>
+      <hr>
+      <a class="google-btn" href="/auth/google">Login with Google</a>
+    </form>
+  </div>
+</body>
+</html>

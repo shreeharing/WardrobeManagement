@@ -4,6 +4,7 @@ const session = require("express-session");
 const passport = require("passport");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/auth");
+const path = require("path");
 
 dotenv.config();
 require("./config/passport");
@@ -21,16 +22,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session()); 
+app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, ".."))); // serves index.html and style.css
 
 app.use("/auth", authRoutes);
 
 app.get("/", (req, res) => {
-  res.send(`<h1>Welcome ${req.user ? req.user.name : "Guest"}</h1>
-    <a href="/auth/login">Login</a> |
-    <a href="/auth/register">Register</a> |
-    <a href="/auth/google">Login with Google</a> |
-    <a href="/auth/logout">Logout</a>
-  `);
+  res.sendFile(path.join(__dirname, "../index.html"));
 });
 
 app.listen(process.env.PORT, () => 
