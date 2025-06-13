@@ -1,0 +1,465 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #0d0d0d;
+  color: #fff;
+}
+
+a {
+  color: #ff4d4d;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1a1a1a;
+  padding: 15px 30px;
+  position: fixed;
+  width: 95vw;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ff4d4d;
+  text-decoration: none;
+}
+.logo:hover {
+  color: #ff4d4d;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+}
+
+.nav-links li a {
+  color: #ff4d4d;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 999px;
+  transition: background-color 0.3s ease;
+  font-weight: 500;
+}
+.nav-links li a:hover {
+  background-color: #ff4d4d;
+  color: white;
+}
+
+/* HERO SECTION */
+.hero {
+  background: radial-gradient(circle, #1a1a1a 0%, #0d0d0d 100%);
+  padding: 80px 30px;
+}
+
+.hero-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.hero {
+  text-align: center;
+  padding: 100px 20px;
+  background: radial-gradient(circle, #1a1a1a 0%, #0d0d0d 100%);
+}
+.hero-content{
+  margin-left: 100px;
+}
+.hero-content h2 {
+  font-size: 42px;
+  color: #ff4d4d;
+}
+.hero-content p {
+  font-size: 18px;
+  margin: 20px 0;
+  color: #ccc;
+}
+.cta-btn {
+  background-color: #ff1a1a;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+.cta-btn:hover {
+  background-color: #cc0000;
+}
+/* Features Section */
+.features {
+  padding: 60px 30px;
+  text-align: center;
+}
+.features ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+.features li {
+  margin: 10px 0;
+  font-size: 18px;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #111;
+  color: #aaa;
+}
+
+.hero-images {
+  flex: 1 1 400px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+.category-form {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.image-card {
+  width: 200px;
+  height: 250px;
+  border: 2px solid #ff4d4d;
+  border-radius: 16px;
+  background-color: #1a1a1a;
+  box-shadow: 0 0 12px rgba(255, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 0;
+  text-align: center;
+  color: white;
+}
+
+.image-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-bottom: 1px solid #333;
+}
+
+.image-card p {
+  margin: 10px 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.image-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+  background-color: #1a1a1a;
+}
+
+.image-card:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.4);
+}
+
+.inventory-section {
+  padding: 40px 30px;
+  background-color: #0d0d0d;
+  color: #fff;
+}
+
+.inventory-section h2 {
+  text-align: center;
+  color: #ff4d4d;
+  font-size: 32px;
+  margin-bottom: 30px;
+}
+
+/* Add Item Form */.add-item-form {
+  background-color: #1a1a1a;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(255, 0, 0, 0.2);
+  max-width: 600px;
+  margin: 40px auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-around;
+  align-items: flex-end;
+}
+
+.add-item-form label {
+  color: #ff4d4d;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 200px;
+}
+
+.add-item-form input,
+.add-item-form select {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #2a2a2a;
+  color: white;
+  font-size: 16px;
+  outline: none;
+}
+
+.add-item-form select:focus,
+.add-item-form input:focus {
+  border: 1px solid #ff4d4d;
+}
+
+.add-item-form button {
+  padding: 12px 24px;
+  background-color: #ff1a1a;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.add-item-form button:hover {
+  background-color: #cc0000;
+}
+
+
+/* Sort Dropdown */
+.sort-form {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sort-form select {
+  padding: 10px 16px;
+  font-size: 16px;
+  border-radius: 8px;
+  background-color: #1a1a1a;
+  color: white;
+  border: 1px solid #444;
+  margin-left: 8px;
+}
+
+.sort-form select:focus {
+  outline: none;
+  border-color: #ff4d4d;
+}
+
+/* Inventory List */
+.inventory-list {
+  list-style: none;
+  padding: 0;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.inventory-list li {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  margin: 10px 0;
+  padding: 16px 20px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.15);
+}
+
+.inventory-list li div {
+  flex: 1;
+}
+
+/* Delete Button */
+.inventory-list form button {
+  background-color: #660000;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.inventory-list form button:hover {
+  background-color: #cc0000;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.counter button {
+  background-color: #ff4d4d;
+  border: none;
+  color: white;
+  width: 26px;
+  height: 26px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: background-color 0.3s;
+}
+
+.counter button:hover {
+  background-color: #e60000;
+}
+
+.counter input[type="number"] {
+  width: 50px;
+  height: 26px;
+  padding: 0 6px;
+  font-size: 14px;
+  text-align: center;
+  background-color: #1a1a1a;
+  color: white;
+  border: 1px solid #ff4d4d;
+  border-radius: 4px;
+  outline: none;
+}
+
+/* Remove spinners */
+.counter input[type="number"]::-webkit-inner-spin-button,
+.counter input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.counter input[type="number"] {
+  -moz-appearance: textfield;
+}
+.selected-for-delete {
+  background-color: #661111;
+  border-radius: 8px;
+  color: white;
+  padding: 5px;
+}
+/* Inventory list container */
+.inventory-list ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Inventory list items */
+.inventory-list li {
+  background-color: #1f1f1f;
+  border: 1px solid #ff4d4d;
+  border-radius: 8px;
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  transition: background-color 0.3s ease;
+}
+
+/* Delete button inside list */
+.inventory-list .delete-btn {
+  background-color: #ff4d4d;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.inventory-list .delete-btn:hover {
+  background-color: #e63b3b;
+}
+
+/* Selected item highlight */
+.inventory-list li.selected-for-delete {
+  background-color: #661111;
+  border-color: #ffaaaa;
+}
+
+/* Delete controls (Done & Cancel) */
+#delete-controls {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+#delete-controls button {
+  background-color: #444;
+  color: white;
+  border: 1px solid #888;
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#delete-controls button:hover {
+  background-color: #666;
+}
+.inventory-list li.selected-for-delete {
+  background-color: #661111;
+  border-color: #ffaaaa;
+}
+
+#delete-controls {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+#delete-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+}
+
+#delete-controls button {
+  padding: 6px 12px;
+  background-color: #ff4d4d;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#delete-controls button:hover {
+  background-color: #e63946;
+}
+.inventory-list li.selected-for-delete {
+  background-color: #331010;
+  color: #fff;
+  border-left: 4px solid #ff4d4d;
+}

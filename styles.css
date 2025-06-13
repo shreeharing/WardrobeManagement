@@ -19,6 +19,8 @@ a:hover {
   align-items: center;
   background-color: #1a1a1a;
   padding: 15px 30px;
+  position: fixed;
+  width: 95vw;
 }
 
 .logo {
@@ -31,12 +33,12 @@ a:hover {
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 25px;
+  gap: 20px;
 }
 
 .nav-links li a {
   font-weight: 500;
-} */
+} 
 
 .hero {
   text-align: center;
@@ -139,25 +141,26 @@ nav .nav-links a:hover {
 .hero-content {
   flex: 1 1 400px;
   max-width: 500px;
-}
-
-.hero-images {
+}.hero-images {
   flex: 1 1 400px;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 25px;
   justify-content: center;
+  padding-top: 30px;
 }
 
 .hero-images img {
-  width: 180px;
-  height: 220px;
+  width: 240px;
+  height: 270px;
   object-fit: cover;
-  border-radius: 12px;
-  box-shadow: 0 0 12px rgba(255, 0, 0, 0.25);
-  transition: transform 0.3s ease;
+  border-radius: 16px;
+  border: 2px solid #ff1a1a; /* Solid red border */
+  box-shadow: 0 0 18px rgba(255, 0, 0, 0.4); /* Red glow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .hero-images img:hover {
   transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(255, 0, 0, 0.6); /* Stronger glow on hover */
 }

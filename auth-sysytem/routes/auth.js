@@ -8,11 +8,11 @@ const router = express.Router();
 const path = require("path");
 
 router.get("/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "../views/login.html"));
+  res.render('login');
 });
 
 router.get("/register", (req, res) => 
-  res.sendFile(path.join(__dirname, "../views/register.html"))
+  res.render('register')
 );
 
 function isLoggedIn(req, res, next) {
@@ -22,20 +22,66 @@ function isLoggedIn(req, res, next) {
 
 // Dashboard Route
 router.get('/dashboard', isLoggedIn, async (req, res) => {
-  const inventory = await Inventory.find({ userId: req.user._id });
+  let sortOption = {};
+  switch (req.query.sortBy) {
+    case 'category':
+      sortOption = { category: 1 };
+      break;
+    case 'quantity':
+      sortOption = { quantity: -1 };
+      break;
+    case 'date':
+      sortOption = { dateAdded: -1 };
+      break;
+    case 'usageCount':
+      sortOption = { usageCount: -1 };
+      break;
+  }
+  const inventory = await Inventory.find({ userId: req.user._id }).sort(sortOption);
   res.render('dashboard', { user: req.user, inventory });
 });
 
 // Add Inventory Item
 router.post('/add-item', isLoggedIn, async (req, res) => {
-  const { itemName, quantity, category } = req.body;
-  await new Inventory({
-    userId: req.user._id,
-    itemName,
-    quantity,
-    category
-  }).save();
-  res.redirect('/auth/dashboard');
+  try {
+    const { name, category, quantity, timesWorn } = req.body;
+
+    await Inventory.create({
+      userId: req.user._id,
+      name,
+      category,
+      quantity: Number(quantity),
+      usageCount: Number(timesWorn),
+      dateAdded: new Date()
+    });
+
+    res.redirect('/auth/dashboard');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Failed to add item");
+  }
+});
+router.post("/delete-item", async (req, res) => {
+  const rawItemIds = req.body.itemIds;
+
+  console.log("Raw itemIds from form:", rawItemIds);
+
+  if (!rawItemIds) {
+    return res.status(400).send("No items selected for deletion.");
+  }
+
+  let itemIds = [];
+  try {
+    itemIds = JSON.parse(rawItemIds);
+  } catch (err) {
+    console.error("JSON Parse error:", err.message);
+    return res.status(400).send("Invalid itemIds JSON.");
+  }
+
+  // ✅ Use the correct model name
+  await Inventory.deleteMany({ _id: { $in: itemIds } });
+
+  res.redirect("/auth/dashboard");
 });
 
 
@@ -58,11 +104,37 @@ router.get("/logout", (req, res) => {
 });
 
 // Google OAuth
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-router.get("/google/callback", passport.authenticate("google", {
-  failureRedirect: "/auth/login",
-  successRedirect: "/auth/dashboard"
-}));
+router.get('/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+router.get('/google/callback',
+  passport.authenticate('google', { failureRedirect: '/auth/login' }),
+  (req, res) => {
+    if (!req.user.username) {
+      return res.redirect('/auth/choose-username');
+    }
+    res.redirect('/auth/dashboard');
+  }
+);
+
+router.get('/choose-username', isLoggedIn, (req, res) => {
+  res.render('choose-username'); // Renders choose-username.ejs
+});
+
+router.post("/set-username", isLoggedIn, async (req, res) => {
+  const { username } = req.body;
+
+  const existing = await User.findOne({ username });
+  if (existing) {
+    return res.render("choose-username", { error: "Username already taken" });
+  }
+
+  req.user.username = username;
+  await req.user.save();
+
+  res.redirect("/auth/dashboard");
+});
 
 
 module.exports = router;

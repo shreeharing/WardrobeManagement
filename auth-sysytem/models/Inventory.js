@@ -1,14 +1,12 @@
-// models/Inventory.js
 const mongoose = require('mongoose');
 
 const inventorySchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
-  itemName: String,
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  name: String,
+  category: String,
   quantity: Number,
-  category: String
+  dateAdded: { type: Date, default: Date.now },
+  usageCount: { type: Number, default: 0 }
 });
 
 module.exports = mongoose.model('Inventory', inventorySchema);

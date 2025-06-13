@@ -3,24 +3,285 @@
 <html>
 <head>
   <title>Dashboard</title>
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/auth-sysytem/public/auth/dashboard.css" />
 </head>
 <body>
-  <h1>Welcome, <%= user.username %>!</h1>
+   <header>
+    <nav class="navbar">
+      <a href="/auth/dashboard" class="logo">ClosetIQ</a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="/auth/logout">Logout</a></li>
+      </ul>
+    </nav>
+  </header> <!-- Hero -->
+  <section class="hero">
+  <div class="hero-grid">
+    
+    <!-- Left Side: Welcome Message -->
+    <div class="hero-content">
+      <h2>Welcome, <%= user.username %>!</h2>
+      <p>Browse your wardrobe by category.</p>
+    </div>
 
+    <!-- Right Side: Category Emojis -->
+   <div class="hero-images">
+  <form method="GET" action="/auth/dashboard" class="category-form">
+    <button name="category" value="Electronics" class="image-card">
+      <img src="/images/watch.avif" alt="Electronics">
+      <p>Electronics</p>
+    </button>
+    
+    <button name="category" value="Clothing" class="image-card">
+      <img src="/images/shirts.avif" alt="Clothing">
+      <p>Clothing</p>
+    </button>
+    
+    <button name="category" value="Shoes" class="image-card">
+      <img src="/images/shoes.avif" alt="Footwear">
+      <p>Footwear</p>
+    </button>
+  </form>
+</div>
+
+
+  </div>
+</section>
+
+<!-- Inventory Display Section -->
+<section class="inventory-section">
   <h2>Your Inventory</h2>
-  <ul>
-    <% inventory.forEach(item => { %>
-      <li><%= item.itemName %> - <%= item.quantity %> (<%= item.category %>)</li>
-    <% }) %>
-  </ul>
 
-  <form action="/auth/add-item" method="POST">
-  <input name="itemName" placeholder="Item Name" required />
-  <input name="quantity" type="number" placeholder="Qty" required />
-  <input name="category" placeholder="Category" />
-  <button type="submit">Add Item</button>
+  <!-- Add Item Form -->
+  <form method="POST" action="/auth/add-item" class="add-item-form">
+  <!-- First Row -->
+  <div class="form-row">
+    <div class="form-group">
+      <label for="name">Item Name</label>
+      <input type="text" name="name" id="name" required />
+    </div>
+
+    <div class="form-group">
+      <label for="category">Category</label>
+      <select name="category" id="category" required>
+        <option value="">-- Select Category --</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Footwear">Footwear</option>
+        <option value="Clothes">Clothes</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Second Row -->
+  <div class="form-row">
+    <div class="form-group">
+      <label for="quantity">Quantity</label>
+      <div class="counter">
+        <button type="button" onclick="decrement('quantity')">−</button>
+        <input type="number" name="quantity" id="quantity" value="1" min="0" />
+        <button type="button" onclick="increment('quantity')">+</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="timesWorn">Times Worn</label>
+      <div class="counter">
+        <button type="button" onclick="decrement('timesWorn')">−</button>
+        <input type="number" name="timesWorn" id="timesWorn" value="1" min="0" />
+        <button type="button" onclick="increment('timesWorn')">+</button>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="add-btn">Add Item</button>
 </form>
+
+
+  <!-- Sorting Options -->
+  <form class="sort-form" method="GET" action="/dashboard">
+    <label>Sort by: </label>
+    <select name="sortBy" onchange="this.form.submit()">
+      <option value="">--Select--</option>
+      <option value="category">Category</option>
+      <option value="quantity">Quantity</option>
+      <option value="date">Date Added</option>
+      <option value="usageCount">                                           Times Worn</option>
+    </select>
+  </form>
+
+<form id="deleteForm" action="/auth/delete-item" method="POST">
+  <input type="hidden" id="itemIdsInput" name="itemIds" />
+</form>
+
+<div id="delete-controls" style="display: none;">
+  <button id="confirm-delete">Done</button>
+  <button id="cancel-delete">Cancel</button>
+</div>
+
+
+  <!-- Inventory List -->
+ <!-- Confirm Delete Controls (Initially Hidden) -->
+<div id="delete-controls" style="display: none;">
+  <form id="delete-form" method="POST" action="/auth/delete-item">
+    <input type="hidden" name="itemIds" id="itemIdsInput" />
+    <button type="submit" id="confirm-delete">Done</button>
+    <button type="button" id="cancel-delete">Cancel</button>
+  </form>
+</div>
+
+<!-- Inventory Display Section -->
+<ul id="inventoryList" class="inventory-list">
+  <% inventory.forEach(item => { %>
+  <li data-id="<%= item._id %>" style="margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #ccc;">
+    
+    <!-- Item Name -->
+    <div style="font-size: 1.2rem; font-weight: bold;"><%= item.name %></div>
+    
+    <!-- Date Added -->
+    <div style="font-size: 0.9rem; color: #888;">
+      <% 
+        const d = new Date(item.dateAdded);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+      %>
+      Added on: <%= `${day}-${month}-${year}` %>
+    </div>
+
+    <!-- Category -->
+    <div style="font-size: 1rem; color: #555;"><%= item.category %></div>
+
+    <!-- Usage Count and Quantity -->
+    <div style="font-size: 0.85rem; color: #777;">
+      Worn: <%= item.usageCount %> times |
+      Quantity: <%= item.quantity %>
+    </div>
+
+    <!-- Delete Button -->
+    <button class="delete-btn" style="margin-top: 5px;">Delete</button>
+  </li>
+<% }) %>
+
+</ul>
+
+
+
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" style="margin-top: 50px;">
+    <h2>Features</h2>
+    <ul class="features">
+      <li>🧠 Smart outfit suggestions</li>
+      <li>📊 Wardrobe statistics</li>
+      <li>⏰ Maintenance reminders</li>
+      <li>☁️ Cloud backup</li>
+    </ul>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" style="margin-top: 40px;">
+    <h2>About Us</h2>
+    <p>ClosetIQ helps you organize, track, and optimize your wardrobe using AI-powered tools. Our goal is to make your daily outfit decisions faster and smarter.</p>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" style="margin-top: 40px;">
+    <h2>Contact Us</h2>
+    <p>Email: support@closetiq.com</p>
+    <p>Phone: +91-9876543210</p>
+  </section>
+
+  <!-- Footer -->
+  <footer style="margin-top: 50px; text-align:center;">
+    &copy; 2025 ClosetIQ. All rights reserved.
+  </footer>
+  
+<script>
+  // Quantity controls (optional, not related to delete)
+  function increment(id) {
+    const input = document.getElementById(id);
+    if (input) input.value = parseInt(input.value) + 1;
+  }
+
+  function decrement(id) {
+    const input = document.getElementById(id);
+    if (input && parseInt(input.value) > 0) {
+      input.value = parseInt(input.value) - 1;
+    }
+  }
+
+  const deleteButtons = document.querySelectorAll(".delete-btn");
+  const deleteControls = document.getElementById("delete-controls");
+  const inventoryList = document.getElementById("inventoryList");
+
+  let deleteMode = false;
+  let selectedIds = new Set();
+
+  // Setup delete button click
+  deleteButtons.forEach(button => {
+    button.addEventListener("click", (e) => {
+      if (!deleteMode) {
+        deleteMode = true;
+        selectedIds.clear();
+
+        // Hide all delete buttons
+        deleteButtons.forEach(btn => btn.style.display = "none");
+
+        // Mark the clicked item as selected
+        const li = button.closest("li");
+        li.classList.add("selected-for-delete");
+        selectedIds.add(li.dataset.id);
+
+        // Show delete controls
+        deleteControls.style.display = "flex";
+
+        // Allow clicking on <li> to toggle selection
+        inventoryList.querySelectorAll("li").forEach(item => {
+          item.addEventListener("click", () => {
+            const id = item.dataset.id;
+            if (item.classList.contains("selected-for-delete")) {
+              item.classList.remove("selected-for-delete");
+              selectedIds.delete(id);
+            } else {
+              item.classList.add("selected-for-delete");
+              selectedIds.add(id);
+            }
+          });
+        });
+      }
+    });
+  });
+
+  // Confirm delete: submit selected IDs via form
+  document.getElementById('confirm-delete').addEventListener('click', () => {
+  const selectedItems = Array.from(document.querySelectorAll('.selected-for-delete'))
+    .map(li => li.getAttribute('data-id'));
+
+  if (selectedItems.length === 0) return;
+
+  document.getElementById('itemIdsInput').value = JSON.stringify(selectedItems);
+  document.getElementById('deleteForm').submit();
+});
+
+
+  // Cancel delete mode
+  document.getElementById("cancel-delete").addEventListener("click", () => {
+    deleteMode = false;
+    selectedIds.clear();
+
+    deleteControls.style.display = "none";
+
+    deleteButtons.forEach(btn => btn.style.display = "inline");
+    inventoryList.querySelectorAll("li").forEach(item => {
+      item.classList.remove("selected-for-delete");
+    });
+  });
+</script>
+
+
 
 </body>
 </html>

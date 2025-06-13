@@ -10,10 +10,13 @@
   <div class="form-container">
     <h2>Create Account</h2>
     <form method="POST" action="/auth/register">
+      <input type="text" name="username" placeholder="Username" required />
       <input type="email" name="email" placeholder="Email" required />
       <input type="password" name="password" placeholder="Password" required />
       <button type="submit">Register</button>
       <p>Already have an account? <a href="/auth/login">Login here</a></p>
+      <hr>
+      <a class="google-btn" href="/auth/google">Register with Google</a>
     </form>
   </div>
 </body>
