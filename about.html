@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wardrobe Manager</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #111;
+      color: #fff;
+    }
+
+    header {
+      background-color: #b30000;
+      padding: 1.5rem;
+      text-align: center;
+      color: #fff;
+      font-size: 2rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+    }
+
+    .card {
+      background-color: #222;
+      border: 2px solid #b30000;
+      border-radius: 10px;
+      padding: 1.5rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 15px #b30000;
+    }
+
+    .card h3 {
+      color: #ff4d4d;
+      margin-bottom: 0.5rem;
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      color: #ccc;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>🧥 Wardrobe Manager</header>
+
+  <div class="features">
+    <div class="card">
+      <h3>Add Outfit</h3>
+      <p>Easily add new outfits to your wardrobe with photos and tags for quick search.</p>
+    </div>
+    <div class="card">
+      <h3>View Wardrobe</h3>
+      <p>Browse all your clothes in one place, categorized by type and season.</p>
+    </div>
+    <div class="card">
+      <h3>Outfit Suggestions</h3>
+      <p>Get AI-based outfit suggestions based on weather and your schedule.</p>
+    </div>
+    <div class="card">
+      <h3>Laundry Tracker</h3>
+      <p>Track which clothes are clean or dirty and plan your laundry days.</p>
+    </div>
+    <div class="card">
+      <h3>Seasonal Sorting</h3>
+      <p>Automatically sort clothes by season to optimize your wardrobe view.</p>
+    </div>
+  </div>
+
+</body>
+</html>
