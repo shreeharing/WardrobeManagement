@@ -35,12 +35,12 @@
       <p>Electronics</p>
     </button>
     
-    <button name="category" value="Clothing" class="image-card">
+    <button name="category" value="Clothes" class="image-card">
       <img src="/images/shirts.avif" alt="Clothing">
-      <p>Clothing</p>
+      <p>Clothes</p>
     </button>
     
-    <button name="category" value="Shoes" class="image-card">
+    <button name="category" value="Footwear" class="image-card">
       <img src="/images/shoes.avif" alt="Footwear">
       <p>Footwear</p>
     </button>
@@ -107,17 +107,17 @@
 </form>
 
 
-  <!-- Sorting Options -->
-  <form class="sort-form" method="GET" action="/dashboard">
-    <label>Sort by: </label>
-    <select name="sortBy" onchange="this.form.submit()">
-      <option value="">--Select--</option>
-      <option value="category">Category</option>
-      <option value="quantity">Quantity</option>
-      <option value="date">Date Added</option>
-      <option value="usageCount">                                           Times Worn</option>
-    </select>
-  </form>
+ <form class="sort-form" method="GET" action="/auth/dashboard">
+  <label>Sort by: </label>
+  <select name="sortBy" onchange="this.form.submit()">
+    <option value="">--Select--</option>
+    <option value="category" <%= selectedSort === 'category' ? 'selected' : '' %>>Category</option>
+    <option value="quantity" <%= selectedSort === 'quantity' ? 'selected' : '' %>>Quantity</option>
+    <option value="date" <%= selectedSort === 'date' ? 'selected' : '' %>>Date Added</option>
+    <option value="usageCount" <%= selectedSort === 'usageCount' ? 'selected' : '' %>>Times Worn</option>
+  </select>
+</form>
+
 
 <form id="deleteForm" action="/auth/delete-item" method="POST">
   <input type="hidden" id="itemIdsInput" name="itemIds" />
@@ -327,6 +327,21 @@
     });
 
   });
+
+  function increment(id) {
+    const input = document.getElementById(id);
+    if (input) {
+      input.value = parseInt(input.value) + 1;
+    }
+  }
+
+  function decrement(id) {
+    const input = document.getElementById(id);
+    const currentValue = parseInt(input.value);
+    if (input && currentValue > 0) {
+      input.value = currentValue - 1;
+    }
+  }
 </script>
 
 

@@ -22,14 +22,42 @@ function isLoggedIn(req, res, next) {
 
 // Dashboard Route
 router.get('/dashboard', isLoggedIn, async (req, res) => {
-  try {
-    const inventory = await Inventory.find({ userId: req.user._id }).lean();
-    res.render('dashboard', { user: req.user, inventory })
-  } catch (err) {
-    console.error(err);
-    res.send("Error loading dashboard.");
+  const { sortBy, category } = req.query;
+
+  let sortOption = {};
+  switch (sortBy) {
+    case 'category':
+      sortOption = { category: 1 };
+      break;
+    case 'quantity':
+      sortOption = { quantity: -1 };
+      break;
+    case 'date':
+      sortOption = { dateAdded: -1 };
+      break;
+    case 'usageCount':
+      sortOption = { usageCount: -1 };
+      break;
   }
+
+  const filter = { userId: req.user._id };
+  if (category) {
+    filter.category = category;
+  }
+
+  const inventory = await Inventory.find(filter).sort(sortOption);
+
+  res.render('dashboard', {
+    user: req.user,
+    inventory,
+    selectedSort: sortBy || '',
+    selectedCategory: category || ''
+  });
 });
+
+
+
+
 
 
 // Add Inventory Item
