@@ -4,6 +4,7 @@
 <head>
   <title>Dashboard</title>
   <link rel="stylesheet" href="/auth-sysytem/public/auth/dashboard.css" />
+  
 </head>
 <body>
    <header>
@@ -55,7 +56,7 @@
   <h2>Your Inventory</h2>
 
   <!-- Add Item Form -->
-  <form method="POST" action="/auth/add-item" class="add-item-form">
+  <form method="POST" action="/auth/add-item" class="add-item-form" enctype="multipart/form-data">
   <!-- First Row -->
   <div class="form-row">
     <div class="form-group">
@@ -95,6 +96,13 @@
     </div>
   </div>
 
+   <div class="form-row">
+    <div class="form-group">
+    <label for="image">Upload Image</label>
+    <input type="file" name="image" id="image" accept="image/*" required />
+  </div>
+  </div>
+
   <button type="submit" class="add-btn">Add Item</button>
 </form>
 
@@ -122,51 +130,49 @@
 
 
   <!-- Inventory List -->
- <!-- Confirm Delete Controls (Initially Hidden) -->
-<div id="delete-controls" style="display: none;">
-  <form id="delete-form" method="POST" action="/auth/delete-item">
-    <input type="hidden" name="itemIds" id="itemIdsInput" />
-    <button type="submit" id="confirm-delete">Done</button>
-    <button type="button" id="cancel-delete">Cancel</button>
-  </form>
-</div>
 
 <!-- Inventory Display Section -->
 <ul id="inventoryList" class="inventory-list">
   <% inventory.forEach(item => { %>
-  <li data-id="<%= item._id %>" style="margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #ccc;">
-    
-    <!-- Item Name -->
-    <div style="font-size: 1.2rem; font-weight: bold;"><%= item.name %></div>
-    
-    <!-- Date Added -->
-    <div style="font-size: 0.9rem; color: #888;">
-      <% 
-        const d = new Date(item.dateAdded);
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const year = d.getFullYear();
-      %>
-      Added on: <%= `${day}-${month}-${year}` %>
+    <li data-id="<%= item._id %>" class="inventory-item">
+  <img src="<%= item.imageUrl %>" alt="item" class="item-image">
+
+  <div class="item-details">
+    <div class="item-name"><%= item.name %></div>
+    <div class="item-meta">
+      <span>Added on: <%= new Date(item.dateAdded).toLocaleDateString('en-GB') %></span>
+      <span>Category: <%= item.category %></span>
+      <span>Worn: <%= item.usageCount %> times</span>
+      <span>Qty: <%= item.quantity %></span>
+    </div>
+  </div>
+
+  <div class="item-actions">
+    <!-- Worn Increment -->
+    <div class="worn-container" id="worn-container-<%= item._id %>">
+      <button class="action-btn worn-btn" data-id="<%= item._id %>">Worn +</button>
+      <form method="POST" action="/auth/increment-worn/<%= item._id %>" class="increment-form hidden" id="form-<%= item._id %>">
+        <input type="hidden" name="itemId" value="<%= item._id %>">
+        <input type="number" name="incrementValue" min="1" value="1" required>
+        <button type="submit" class="done-btn">Done</button>
+        <button type="button" class="cancel-btn">Cancel</button>
+      </form>
     </div>
 
-    <!-- Category -->
-    <div style="font-size: 1rem; color: #555;"><%= item.category %></div>
-
-    <!-- Usage Count and Quantity -->
-    <div style="font-size: 0.85rem; color: #777;">
-      Worn: <%= item.usageCount %> times |
-      Quantity: <%= item.quantity %>
+    <!-- Delete Confirm -->
+    <div class="delete-container" id="delete-container-<%= item._id %>">
+      <button class="action-btn delete-btn" data-id="<%= item._id %>">Delete</button>
+      <form method="POST" action="/auth/delete-item" class="confirm-delete hidden" id="confirm-delete-<%= item._id %>">
+        <input type="hidden" name="itemIds" value='["<%= item._id %>"]'>
+        <button type="submit" class="done-btn">Done</button>
+        <button type="button" class="cancel-delete-btn">Cancel</button>
+      </form>
     </div>
+  </div>
+</li>
 
-    <!-- Delete Button -->
-    <button class="delete-btn" style="margin-top: 5px;">Delete</button>
-  </li>
-<% }) %>
-
+  <% }) %>
 </ul>
-
-
 
   </section>
 
@@ -200,86 +206,129 @@
   </footer>
   
 <script>
-  // Quantity controls (optional, not related to delete)
-  function increment(id) {
-    const input = document.getElementById(id);
-    if (input) input.value = parseInt(input.value) + 1;
-  }
+  document.addEventListener('DOMContentLoaded', () => {
 
-  function decrement(id) {
-    const input = document.getElementById(id);
-    if (input && parseInt(input.value) > 0) {
-      input.value = parseInt(input.value) - 1;
+    // Quantity controls (optional)
+    function increment(id) {
+      const input = document.getElementById(id);
+      if (input) input.value = parseInt(input.value) + 1;
     }
-  }
 
-  const deleteButtons = document.querySelectorAll(".delete-btn");
-  const deleteControls = document.getElementById("delete-controls");
-  const inventoryList = document.getElementById("inventoryList");
-
-  let deleteMode = false;
-  let selectedIds = new Set();
-
-  // Setup delete button click
-  deleteButtons.forEach(button => {
-    button.addEventListener("click", (e) => {
-      if (!deleteMode) {
-        deleteMode = true;
-        selectedIds.clear();
-
-        // Hide all delete buttons
-        deleteButtons.forEach(btn => btn.style.display = "none");
-
-        // Mark the clicked item as selected
-        const li = button.closest("li");
-        li.classList.add("selected-for-delete");
-        selectedIds.add(li.dataset.id);
-
-        // Show delete controls
-        deleteControls.style.display = "flex";
-
-        // Allow clicking on <li> to toggle selection
-        inventoryList.querySelectorAll("li").forEach(item => {
-          item.addEventListener("click", () => {
-            const id = item.dataset.id;
-            if (item.classList.contains("selected-for-delete")) {
-              item.classList.remove("selected-for-delete");
-              selectedIds.delete(id);
-            } else {
-              item.classList.add("selected-for-delete");
-              selectedIds.add(id);
-            }
-          });
-        });
+    function decrement(id) {
+      const input = document.getElementById(id);
+      if (input && parseInt(input.value) > 0) {
+        input.value = parseInt(input.value) - 1;
       }
+    }
+
+    const deleteButtons = document.querySelectorAll(".delete-btn");
+    const deleteControls = document.getElementById("delete-controls");
+    const inventoryList = document.getElementById("inventoryList");
+
+    let deleteMode = false;
+    let selectedIds = new Set();
+
+    // Setup delete button click
+    deleteButtons.forEach(button => {
+      button.addEventListener("click", (e) => {
+        if (!deleteMode) {
+          deleteMode = true;
+          selectedIds.clear();
+
+          deleteButtons.forEach(btn => btn.style.display = "none");
+
+          const li = button.closest("li");
+          li.classList.add("selected-for-delete");
+          selectedIds.add(li.dataset.id);
+
+          deleteControls.style.display = "flex";
+
+          inventoryList.querySelectorAll("li").forEach(item => {
+            item.addEventListener("click", () => {
+              const id = item.dataset.id;
+              if (item.classList.contains("selected-for-delete")) {
+                item.classList.remove("selected-for-delete");
+                selectedIds.delete(id);
+              } else {
+                item.classList.add("selected-for-delete");
+                selectedIds.add(id);
+              }
+            });
+          });
+        }
+      });
     });
-  });
 
-  // Confirm delete: submit selected IDs via form
-  document.getElementById('confirm-delete').addEventListener('click', () => {
-  const selectedItems = Array.from(document.querySelectorAll('.selected-for-delete'))
-    .map(li => li.getAttribute('data-id'));
+    // Confirm delete
+    document.getElementById('confirm-delete').addEventListener('click', () => {
+      const selectedItems = Array.from(document.querySelectorAll('.selected-for-delete'))
+        .map(li => li.getAttribute('data-id'));
 
-  if (selectedItems.length === 0) return;
+      if (selectedItems.length === 0) return;
 
-  document.getElementById('itemIdsInput').value = JSON.stringify(selectedItems);
-  document.getElementById('deleteForm').submit();
-});
-
-
-  // Cancel delete mode
-  document.getElementById("cancel-delete").addEventListener("click", () => {
-    deleteMode = false;
-    selectedIds.clear();
-
-    deleteControls.style.display = "none";
-
-    deleteButtons.forEach(btn => btn.style.display = "inline");
-    inventoryList.querySelectorAll("li").forEach(item => {
-      item.classList.remove("selected-for-delete");
+      document.getElementById('itemIdsInput').value = JSON.stringify(selectedItems);
+      document.getElementById('deleteForm').submit();
     });
+
+    // Cancel delete mode
+    document.getElementById("cancel-delete").addEventListener("click", () => {
+      deleteMode = false;
+      selectedIds.clear();
+
+      deleteControls.style.display = "none";
+
+      deleteButtons.forEach(btn => btn.style.display = "inline");
+      inventoryList.querySelectorAll("li").forEach(item => {
+        item.classList.remove("selected-for-delete");
+      });
+    });
+
+    // Handle Cloudinary image upload
+    const imageInput = document.getElementById('imageUpload');
+    if (imageInput) {
+      imageInput.addEventListener('change', async function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "your_upload_preset"); // Set correctly
+
+        const res = await fetch("https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+        document.getElementById('imageUrl').value = data.secure_url;
+        alert("Image uploaded!");
+      });
+    }
+
+    // Fix: worn increment button logic
+    document.querySelectorAll('.worn-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const id = button.getAttribute('data-id');
+        const form = document.getElementById(`form-${id}`);
+        if (form) {
+          form.classList.remove('hidden');
+          button.classList.add('hidden');
+        }
+      });
+    });
+
+    document.querySelectorAll('.cancel-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const form = e.target.closest('.increment-form');
+        form.classList.add('hidden');
+        const wornBtn = form.previousElementSibling;
+        wornBtn.classList.remove('hidden');
+      });
+    });
+
   });
 </script>
+
 
 
 

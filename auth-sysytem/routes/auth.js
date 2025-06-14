@@ -4,8 +4,8 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const Inventory = require('../models/Inventory');
 const router = express.Router();
-
-const path = require("path");
+const path = require('path');
+const { upload } = require('../config/cloudinary');
 
 router.get("/login", (req, res) => {
   res.render('login');
@@ -22,45 +22,43 @@ function isLoggedIn(req, res, next) {
 
 // Dashboard Route
 router.get('/dashboard', isLoggedIn, async (req, res) => {
-  let sortOption = {};
-  switch (req.query.sortBy) {
-    case 'category':
-      sortOption = { category: 1 };
-      break;
-    case 'quantity':
-      sortOption = { quantity: -1 };
-      break;
-    case 'date':
-      sortOption = { dateAdded: -1 };
-      break;
-    case 'usageCount':
-      sortOption = { usageCount: -1 };
-      break;
+  try {
+    const inventory = await Inventory.find({ userId: req.user._id }).lean();
+    res.render('dashboard', { user: req.user, inventory })
+  } catch (err) {
+    console.error(err);
+    res.send("Error loading dashboard.");
   }
-  const inventory = await Inventory.find({ userId: req.user._id }).sort(sortOption);
-  res.render('dashboard', { user: req.user, inventory });
 });
 
+
 // Add Inventory Item
-router.post('/add-item', isLoggedIn, async (req, res) => {
+router.post('/add-item', isLoggedIn, upload.single('image'), async (req, res) => {
+   console.log("Received file:", req.file); 
   try {
     const { name, category, quantity, timesWorn } = req.body;
+
+    if (!name || !category || !quantity || !req.file || !req.file.path) {
+      return res.status(400).send("All fields including image are required.");
+    }
 
     await Inventory.create({
       userId: req.user._id,
       name,
       category,
       quantity: Number(quantity),
-      usageCount: Number(timesWorn),
+      usageCount: Number(timesWorn) || 0,
+      imageUrl: req.file.path,
       dateAdded: new Date()
     });
 
     res.redirect('/auth/dashboard');
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Failed to add item");
+    console.error("Error adding item:", err);
+    res.status(500).send("Failed to add item.");
   }
 });
+
 router.post("/delete-item", async (req, res) => {
   const rawItemIds = req.body.itemIds;
 
@@ -135,6 +133,36 @@ router.post("/set-username", isLoggedIn, async (req, res) => {
 
   res.redirect("/auth/dashboard");
 });
+router.post('/increment-worn/:id', isLoggedIn, async (req, res) => {
+  const itemId = req.params.id;
+  const count = parseInt(req.body.incrementValue);
+
+  console.log('Incrementing usage count by:', count);
+  console.log('For item ID:', itemId);
+
+  if (isNaN(count) || count <= 0) {
+    console.log("❌ Invalid count received");
+    return res.redirect('/auth/dashboard');
+  }
+
+  try {
+    const result = await Inventory.updateOne(
+      { _id: itemId, userId: req.user._id },   // ensure it's only the user's item
+      { $inc: { usageCount: count } }
+    );
+
+    const updatedItem = await Inventory.findById(itemId);
+    console.log("Updated item usage count:", updatedItem.usageCount);
+
+    console.log("Update result:", result);
+    res.redirect('/auth/dashboard');
+  } catch (err) {
+    console.error("❌ Update failed:", err);
+    res.redirect('/auth/dashboard');
+  }
+});
+
+
 
 
 module.exports = router;

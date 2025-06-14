@@ -21,6 +21,7 @@ a:hover {
   padding: 15px 30px;
   position: fixed;
   width: 95vw;
+  z-index: 100;
 }
 
 .logo {

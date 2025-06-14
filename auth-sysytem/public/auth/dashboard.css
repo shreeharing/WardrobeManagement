@@ -22,6 +22,7 @@ a:hover {
   padding: 15px 30px;
   position: fixed;
   width: 95vw;
+  z-index: 100;
 }
 
 .logo {
@@ -296,12 +297,14 @@ footer {
 }
 
 /* Delete Button */
-.inventory-list form button {
-  background-color: #660000;
+.inventory-list form button,.confirm-delete{
+  padding: 12px 24px;
+  width: 100px;
+  background-color: #ff1a1a;
   color: white;
+  font-weight: bold;
   border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s;
 }
@@ -462,4 +465,206 @@ footer {
   background-color: #331010;
   color: #fff;
   border-left: 4px solid #ff4d4d;
+}
+.item-box {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.item-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.item-details {
+  flex-grow: 1;
+}
+.inventory-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .inventory-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .item-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .item-details {
+    flex-grow: 1;
+  }
+
+  .item-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  .item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+    color: #555;
+    gap: 10px;
+    margin-top: 5px;
+  }
+
+  .item-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  .button-common {
+  padding: 12px 24px;
+  background-color: #ff1a1a;
+  width: 100px;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+  }
+
+  .button-common:hover{
+    background-color: #cc0000;
+  }
+
+  .increment-form {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+  }
+
+  .increment-form input[type="number"] {
+    width: 60px;
+    padding: 3px;
+  }
+
+  .hidden {
+    display: none;
+  }
+  #confirm-delete{
+     padding: 12px 24px;
+  width: 100px;
+  background-color: #ff1a1a;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+  }
+
+  .inventory-item {
+  display: flex;
+  align-items: flex-start;
+  border-bottom: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 10px;
+  gap: 15px;
+}
+
+.item-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.item-details {
+  flex-grow: 1;
+}
+
+.item-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.item-meta span {
+  display: inline-block;
+  margin-right: 15px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.item-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.action-btn {
+  background-color: #333;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.increment-form,
+.confirm-delete {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.done-btn,
+.cancel-btn,
+.cancel-delete-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.done-btn {
+  background-color: #ff1a1a;
+  color: white;
+}
+
+.cancel-btn,
+.cancel-delete-btn {
+  background-color: #aaa;
+  color: white;
+}
+
+.hidden {
+  display: none;
+}
+.action-btn {
+  background-color: #dc3545; /* red theme */
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 6px;
+  transition: background 0.3s;
+}
+
+.action-btn:hover {
+  background-color: #c82333;
 }

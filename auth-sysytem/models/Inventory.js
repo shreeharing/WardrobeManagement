@@ -5,8 +5,9 @@ const inventorySchema = new mongoose.Schema({
   name: String,
   category: String,
   quantity: Number,
+  imageUrl: String,
   dateAdded: { type: Date, default: Date.now },
-  usageCount: { type: Number, default: 0 }
+  usageCount: { type: Number, default: 1 }
 });
 
 module.exports = mongoose.model('Inventory', inventorySchema);
