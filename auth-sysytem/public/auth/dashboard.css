@@ -654,14 +654,14 @@ footer {
   display: none;
 }
 .action-btn {
-  background-color: #dc3545; /* red theme */
-  color: #fff;
+  padding: 12px 24px;
+  width: 100px;
+  background-color: #ff1a1a;
+  color: white;
+  font-weight: bold;
   border: none;
-  padding: 6px 14px;
-  font-size: 0.85rem;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  margin-left: 6px;
   transition: background 0.3s;
 }
 
