@@ -1,0 +1,8 @@
+<h1>Hello, <%= user.username %>!</h1>
+
+<h2>Your Wardrobe</h2>
+<ul>
+  <% inventory.forEach(item => { %>
+    <li><%= item.name %> - <%= item.category %></li>
+  <% }) %>
+</ul>

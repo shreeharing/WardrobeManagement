@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Search</title>
+  <link rel="stylesheet" href="/auth-sysytem/public/auth/userSearch.css" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar" id="navbar">
+    <div class="nav-left">
+      <a href="/auth/dashboard" class="nav-logo">👗 Wardrobe</a>
+    </div>
+    <div class="nav-right">
+        <button id="addPostBtn" class="search-btn">+ Add Post</button>
+        <a href="/auth/my-posts" class="nav-btn">📝 My Posts</a>
+        <button id="searchToggleBtn" class="search-btn">Search 🔍</button>
+    </div>
+  </header>
+
+  <!-- Search Box -->
+  <div class="search-box hidden" id="searchBox">
+    <input type="text" id="searchInput" placeholder="Search by username..." />
+    <button id="searchUserBtn" class="action-btn">🔍</button>
+    <button id="closeSearch" class="action-btn">❌</button>
+  </div>
+
+  <!-- Search Results -->
+  <% if (users && users.length > 0 && searched) { %>
+    <div class="results-container">
+      <% users.forEach(user => {
+           const isFriend = currentUser.friends.some(friend => friend.toString() === user._id.toString());
+      %>
+        <div class="user-card">
+          <p><strong>Username:</strong> <%= user.username %></p>
+          <form action="/auth/<%= isFriend ? 'remove-friend' : 'add-friend' %>/<%= user._id %>" method="POST">
+            <button class="add-btn" type="submit"><%= isFriend ? 'Remove Friend' : 'Add Friend' %></button>
+          </form>
+        </div>
+      <% }) %>
+    </div>
+  <% } else if (searched) { %>
+    <p class="no-results">No users found.</p>
+  <% } %>
+
+  <!-- Add Post Modal -->
+  <div id="postModal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content postal-card">
+      <div class="top-bar">
+        <span id="closeModal" class="close-btn">❌</span>
+        <div class="top-search-icon">
+          <button id="toggleSearch" type="button">🔍</button>
+        </div>
+      </div>
+
+      <div class="item-search-wrapper hidden" id="searchBar">
+        <input type="text" id="searchItemInput" placeholder="Search items in wardrobe..." />
+        <button type="button" id="searchItemBtn">🔍</button>
+      </div>
+
+      <h2>Create New Post</h2>
+
+      <form action="/auth/create-post" method="POST">
+        <label for="items">Select items from your wardrobe:</label>
+        <p><%= inventory && inventory.length %> items in wardrobe.</p>
+        <select name="items[]" id="itemsSelect" multiple required size="6">
+          <% inventory.forEach(item => { %>
+            <option value="<%= item._id %>"><%= item.name %> - <%= item.category %></option>
+          <% }) %>
+        </select>
+
+        <label for="caption">Caption:</label>
+        <textarea name="caption" id="caption" rows="3" placeholder="Say something..."></textarea>
+
+        <div class="modal-actions">
+          <button type="submit" class="post-btn">Post</button>
+          <button type="button" id="cancelPost" class="cancel-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Feed Section -->
+  <h2>Your Feed</h2>
+  <div class="feed-container">
+    <% posts.forEach(post => { %>
+      <div class="post-card">
+        <div class="post-header">
+          <strong><%= post.user?.username || 'Unknown User' %></strong>
+        </div>
+
+        <% if (post.items && post.items.length > 0) { %>
+          <% post.items.forEach(item => { %>
+            <div class="item-info">
+              <% if (item.imageUrl) { %>
+                <img src="<%= item.imageUrl %>" alt="Item Image" class="post-image" />
+              <% } else { %>
+                <p>[No Image]</p>
+              <% } %>
+              <p><strong>Name:</strong> <%= item.name %></p>
+              <p><strong>Category:</strong> <%= item.category %></p>
+              <p><strong>Quantity:</strong> <%= item.quantity %></p>
+              <p><strong>Usage Count:</strong> <%= item.usageCount %></p>
+              <p><strong>Date Added:</strong> <%= item.dateAdded ? new Date(item.dateAdded).toDateString() : 'N/A' %></p>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p>No items attached to this post.</p>
+        <% } %>
+
+        <div class="post-caption"><%= post.caption %></div>
+
+        <div class="post-actions">
+          <form action="/auth/like/<%= post._id %>" method="POST">
+            <button type="submit" class="like-btn">❤️ <%= post.likes.length %></button>
+          </form>
+
+          <button class="comment-btn" onclick="toggleCommentModal('<%= post._id %>')">
+            💬 Comments (<%= post.comments.length %>)
+          </button>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <!-- Comment Modal -->
+  <div id="commentsModal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content postal-card">
+      <div class="top-bar">
+        <span id="closeCommentsModal" class="close-btn">❌</span>
+        <h3>Comments</h3>
+      </div>
+
+      <div id="commentsList" style="max-height: 300px; overflow-y: auto; margin-bottom: 1rem;"></div>
+
+      <form id="addCommentForm" action="/auth/comments/{{post._id}}" method="POST">
+        <input type="hidden" id="commentPostId" name="postId" />
+        <textarea name="text" id="commentText" rows="3" placeholder="Add your comment..." required></textarea>
+        <button type="submit" class="post-btn">Add Comment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // === COMMENT MODAL ===
+    const commentsModal = document.getElementById('commentsModal');
+const closeCommentsModalBtn = document.getElementById('closeCommentsModal');
+const commentsList = document.getElementById('commentsList');
+const addCommentForm = document.getElementById('addCommentForm');
+const commentPostIdInput = document.getElementById('commentPostId');
+const commentText = document.getElementById('commentText');
+
+function toggleCommentModal(postId) {
+  commentPostIdInput.value = postId;
+  commentText.value = '';
+  commentsList.innerHTML = 'Loading comments...';
+
+  fetch(`/auth/comments/${postId}`)
+    .then(res => res.json())
+    .then(comments => {
+      if (!Array.isArray(comments)) throw new Error("Invalid comments");
+      renderComments(comments, postId);
+    })
+    .catch(err => {
+      console.error('Error loading comments:', err);
+      commentsList.innerHTML = '<p>Error loading comments.</p>';
+    });
+
+  commentsModal.classList.remove('hidden');
+}
+
+function renderComments(comments, postId) {
+  if (!comments || comments.length === 0) {
+    commentsList.innerHTML = '<p>No comments yet.</p>';
+    return;
+  }
+
+  commentsList.innerHTML = comments.map(comment => `
+    <div class="comment-item" style="border-bottom:1px solid #ddd; padding:0.5rem 0;">
+      <strong>${comment.user}</strong>:
+      <p>${comment.text}</p>
+      <button onclick="deleteComment('${comment._id}', '${postId}')" style="color:red; font-size:0.8rem;">Delete</button>
+    </div>
+  `).join('');
+}
+
+addCommentForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const postId = commentPostIdInput.value;
+  const text = commentText.value.trim();
+
+  if (!text) return alert('Please enter a comment.');
+
+  fetch(`/auth/comments/${postId}`, { // 🔧 Fixed endpoint here
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text })
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to add comment');
+      return res.json();
+    })
+    .then(() => {
+      commentText.value = '';
+      toggleCommentModal(postId);
+    })
+    .catch(err => {
+      console.error('Error posting comment:', err);
+      alert('Error adding comment.');
+    });
+});
+
+function deleteComment(commentId, postId) {
+  if (!confirm('Delete this comment?')) return;
+
+  fetch(`/auth/comment/delete/${commentId}`, {
+    method: 'DELETE'
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to delete comment');
+      return res.json();
+    })
+    .then(() => {
+      toggleCommentModal(postId);
+    })
+    .catch(err => {
+      console.error('Error deleting comment:', err);
+      alert('Error deleting comment.');
+    });
+}
+
+closeCommentsModalBtn.addEventListener('click', () => {
+  commentsModal.classList.add('hidden');
+  commentsList.innerHTML = '';
+});
+
+// === NAVBAR SEARCH TOGGLE ===
+const searchBtn = document.getElementById('searchToggleBtn');
+const navbar = document.getElementById('navbar');
+const searchBox = document.getElementById('searchBox');
+const closeBtn = document.getElementById('closeSearch');
+const searchUserBtn = document.getElementById('searchUserBtn');
+
+searchBtn.addEventListener('click', () => {
+  navbar.classList.add('hidden');
+  searchBox.classList.remove('hidden');
+});
+
+closeBtn.addEventListener('click', () => {
+  searchBox.classList.add('hidden');
+  navbar.classList.remove('hidden');
+});
+
+searchUserBtn.addEventListener('click', () => {
+  const query = document.getElementById('searchInput').value.trim();
+  if (query) {
+    window.location.href = `/auth/users?search=${encodeURIComponent(query)}`;
+  }
+});
+
+// === POST MODAL (CREATE POST) ===
+const addPostBtn = document.getElementById('addPostBtn');
+const postModal = document.getElementById('postModal');
+const closeModal = document.getElementById('closeModal');
+const cancelPost = document.getElementById('cancelPost');
+
+addPostBtn.addEventListener('click', () => {
+  postModal.classList.remove('hidden');
+});
+
+closeModal.addEventListener('click', () => {
+  postModal.classList.add('hidden');
+});
+
+cancelPost.addEventListener('click', () => {
+  postModal.classList.add('hidden');
+});
+
+// === LIVE ITEM SEARCH FILTER IN SELECT BOX ===
+document.addEventListener('DOMContentLoaded', () => {
+  const selectBox = document.getElementById('itemsSelect');
+  const searchItemInput = document.getElementById('searchItemInput');
+
+  if (selectBox && searchItemInput) {
+    const options = selectBox.querySelectorAll('option');
+    const visibleRows = Math.min(Math.max(options.length, 2), 6);
+    selectBox.setAttribute('size', visibleRows);
+
+    searchItemInput.addEventListener('input', function () {
+      const query = this.value.toLowerCase();
+      options.forEach(option => {
+        option.style.display = option.textContent.toLowerCase().includes(query) ? '' : 'none';
+      });
+    });
+  }
+});
+
+  </script>
+
+</body>
+</html>
